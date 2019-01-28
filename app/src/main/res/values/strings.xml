@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">FotoMojon</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">El MapaMojon</string>
+    <string name="title_dashboard">Listado de mierdas</string>
+    <string name="title_notifications">Aqui yace una mierda</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="location_text">"Latitud: %1$.4f \n Longitud: %2$.4f
+\n Hora: %3$tr"</string>
 </resources>

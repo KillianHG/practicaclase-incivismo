@@ -3,6 +3,7 @@ package com.example.a41011561p.fotomojon;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -11,7 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
 import static android.content.ContentValues.TAG;
 
@@ -21,28 +27,60 @@ import static android.content.ContentValues.TAG;
  */
 public class NotificarFragment extends Fragment {
 
+    Button buttonLocation;
+    final int REQUEST_LOCATION_PERMISSION = 1;
+    private final String TAG = this.getClass().getSimpleName();
+    Location mLastLocation;
+    FusedLocationProviderClient mFusedLocationClient;
+    TextView mLocationTextView;
+
 
     public NotificarFragment() {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notificar, container, false);
+        View view = inflater.inflate(R.layout.fragment_notificar, container, false);
+
+        mLocationTextView = view.findViewById(R.id.localitzacio);
+
+        buttonLocation = view.findViewById(R.id.button_location);
+
+        buttonLocation.setOnClickListener(v -> {
+            getLocation();
+        });
+
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+
+        return view;
     }
 
+
+
     private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this,
+        if (ActivityCompat.checkSelfPermission(this.getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]
+            ActivityCompat.requestPermissions(this.getActivity(), new String[]
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         } else {
-            Log.d(TAG, "getLocation: permissions granted");
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(
+                    location -> {
+                        if (location != null) {
+                            mLastLocation = location;
+                            mLocationTextView.setText(
+                                    getString(R.string.location_text,
+                                            mLastLocation.getLatitude(),
+                                            mLastLocation.getLongitude(),
+                                            mLastLocation.getTime()));
+                        } else {
+                            mLocationTextView.setText("Sense localització coneguda");
+                        }
+                    });
         }
     }
 

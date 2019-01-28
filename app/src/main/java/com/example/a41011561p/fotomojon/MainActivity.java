@@ -1,5 +1,6 @@
 package com.example.a41011561p.fotomojon;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -22,14 +23,17 @@ public class MainActivity extends AppCompatActivity {
             = item -> {
         switch (item.getItemId()) {
             case R.id.navigation_home:
+                setTitle(R.string.title_notifications);
                 fm.beginTransaction().hide(active).show(fragment1).commit();
                 active = fragment1;
                 return true;
             case R.id.navigation_llistat:
+                setTitle(R.string.title_dashboard);
                 fm.beginTransaction().hide(active).show(fragment2).commit();
                 active = fragment2;
                 return true;
             case R.id.navigation_mapa:
+                setTitle(R.string.title_home);
                 fm.beginTransaction().hide(active).show(fragment3).commit();
                 active = fragment3;
                 return true;
