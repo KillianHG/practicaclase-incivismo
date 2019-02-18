@@ -11,6 +11,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -28,6 +29,9 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,10 +44,14 @@ import static android.content.ContentValues.TAG;
 /**
  * A simple {@link Fragment} subclass.
  */
-    public class NotificarFragment extends Fragment {
-    TextView mLocationTextView;
+public class NotificarFragment extends Fragment {
     ProgressBar mLoading;
-    private Button button;
+    private TextInputEditText txtLatitud;
+    private TextInputEditText txtLongitud;
+    private TextInputEditText txtDireccio;
+    private TextInputEditText txtDescripcio;
+
+    private Button buttonNotificar;
     private SharedViewModel model;
 
     public NotificarFragment() {
@@ -55,18 +63,26 @@ import static android.content.ContentValues.TAG;
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_notificar, container, false);
 
-        button = view.findViewById(R.id.button_location);
-        mLocationTextView = view.findViewById(R.id.localitzacio);
         mLoading = view.findViewById(R.id.loading);
 
         model = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
 
+        txtLatitud = view.findViewById(R.id.txtLatitud);
+        txtLongitud = view.findViewById(R.id.txtLongitud);
+        txtDireccio = view.findViewById(R.id.txtDireccio);
+        txtDescripcio = view.findViewById(R.id.txtDescripcio);
+        buttonNotificar = view.findViewById(R.id.button_notificar);
+
         model.getCurrentAddress().observe(this, address -> {
-            mLocationTextView.setText(getString(R.string.address_text,
+            txtDireccio.setText(getString(R.string.address_text,
                     address, System.currentTimeMillis()));
         });
+        model.getCurrentLatLng().observe(this, latlng -> {
+            txtLatitud.setText(String.valueOf(latlng.latitude));
+            txtLongitud.setText(String.valueOf(latlng.longitude));
+        });
 
-        model.getButtonText().observe(this, s -> button.setText(s));
+
         model.getProgressBar().observe(this, visible -> {
             if (visible)
                 mLoading.setVisibility(ProgressBar.VISIBLE);
@@ -74,7 +90,30 @@ import static android.content.ContentValues.TAG;
                 mLoading.setVisibility(ProgressBar.INVISIBLE);
         });
 
-        button.setOnClickListener((View clickedView) -> model.switchTrackingLocation());
+        model.switchTrackingLocation();
+
+
+        buttonNotificar.setOnClickListener(button -> {
+            Incidencia incidencia = new Incidencia();
+            incidencia.setDireccio(txtDireccio.getText().toString());
+            incidencia.setLatitud(txtLatitud.getText().toString());
+            incidencia.setLongitud(txtLongitud.getText().toString());
+            incidencia.setProblema(txtDescripcio.getText().toString());
+
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference base = FirebaseDatabase.getInstance().getReference();
+
+            if (auth.getUid() != null) {
+                DatabaseReference users = base.child("users");
+                DatabaseReference uid = users.child(auth.getUid());
+                DatabaseReference incidencies = uid.child("incidencies");
+
+                DatabaseReference reference = incidencies.push();
+                reference.setValue(incidencia);
+
+                Toast.makeText(getContext(), "Avís donat", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
     }

@@ -18,6 +18,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class SharedViewModel extends AndroidViewModel {
     private final MutableLiveData<String> checkPermission = new MutableLiveData<>();
     private final MutableLiveData<String> buttonText = new MutableLiveData<>();
     private final MutableLiveData<Boolean> progressBar = new MutableLiveData<>();
+    private final MutableLiveData<LatLng> currentLatLng = new MutableLiveData<>();
 
     private boolean mTrackingLocation;
     FusedLocationProviderClient mFusedLocationClient;
@@ -42,6 +44,9 @@ public class SharedViewModel extends AndroidViewModel {
 
     void setFusedLocationClient(FusedLocationProviderClient mFusedLocationClient) {
         this.mFusedLocationClient = mFusedLocationClient;
+    }
+    public MutableLiveData<LatLng> getCurrentLatLng() {
+        return currentLatLng;
     }
 
     LiveData<String> getCurrentAddress() {
@@ -137,6 +142,9 @@ public class SharedViewModel extends AndroidViewModel {
             String resultMessage = "";
 
             try {
+                LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+                currentLatLng.postValue(latlng);
+
                 addresses = geocoder.getFromLocation(
                         location.getLatitude(),
                         location.getLongitude(),
