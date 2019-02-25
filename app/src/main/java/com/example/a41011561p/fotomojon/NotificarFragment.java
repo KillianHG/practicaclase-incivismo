@@ -61,8 +61,6 @@ public class NotificarFragment extends Fragment {
     private TextInputEditText txtLongitud;
     private TextInputEditText txtDireccio;
     private TextInputEditText txtDescripcio;
-    private ImageView Foto;
-    private Button buttonFoto;
 
     String mCurrentPhotoPath;
     private File createImageFile() throws IOException {
@@ -141,8 +139,8 @@ public class NotificarFragment extends Fragment {
         txtDireccio = view.findViewById(R.id.txtDireccio);
         txtDescripcio = view.findViewById(R.id.txtDescripcio);
         buttonNotificar = view.findViewById(R.id.button_notificar);
-        Foto = view.findViewById(R.id.foto);
-        buttonFoto = view.findViewById(R.id.button_foto);
+        ImageView Foto = view.findViewById(R.id.foto);
+        Button buttonFoto = view.findViewById(R.id.button_foto);
 
         model.getCurrentAddress().observe(this, address -> {
             txtDireccio.setText(getString(R.string.address_text,
